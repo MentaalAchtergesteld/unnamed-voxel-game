@@ -1,4 +1,8 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{
+    prelude::*,
+    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    utils::HashMap,
+};
 use bracket_noise::prelude::*;
 use rand::prelude::*;
 
@@ -168,7 +172,7 @@ fn update_chunk_meshes(
 
             commands.spawn((
                 PbrBundle {
-                    mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+                    mesh: meshes.add(generate_cuboid_mesh(Vec3::new(1.0, 1.0, 1.0))),
                     material: materials.add(color.into()),
                     transform: Transform::from_xyz(
                         position.x as f32 + chunk.position.x as f32 * 32.0,
@@ -226,3 +230,90 @@ fn update_chunk_meshes(
 //         });
 //     }
 // }
+
+pub fn generate_cuboid_mesh(size: Vec3) -> Mesh {
+    let mut cube_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+
+    cube_mesh.insert_attribute(
+        Mesh::ATTRIBUTE_POSITION,
+        vec![
+            // Top vertices
+            [0., size.y, 0.],
+            [0., size.y, size.z],
+            [size.x, size.y, size.z],
+            [size.x, size.y, 0.],
+            // Bottom vertices
+            [0., 0., 0.],
+            [0., 0., size.z],
+            [size.x, 0., size.z],
+            [size.x, 0., 0.],
+            // Right vertices
+            [size.x, 0., 0.],
+            [size.x, size.y, 0.],
+            [size.x, size.y, size.z],
+            [size.x, 0., size.z],
+            // Left vertices
+            [0., 0., size.z],
+            [0., size.y, size.z],
+            [0., size.y, 0.],
+            [0., 0., 0.],
+            // Front vertices
+            [size.x, 0., size.z],
+            [size.x, size.y, size.z],
+            [0., size.y, size.z],
+            [0., 0., size.z],
+            // Back vertices
+            [0., 0., 0.],
+            [0., size.y, 0.],
+            [size.x, size.y, 0.],
+            [size.x, 0., 0.],
+        ],
+    );
+
+    cube_mesh.insert_attribute(
+        Mesh::ATTRIBUTE_NORMAL,
+        vec![
+            // Top normals
+            [0.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+            // Bottom normals
+            [0.0, -1.0, 0.0],
+            [0.0, -1.0, 0.0],
+            [0.0, -1.0, 0.0],
+            [0.0, -1.0, 0.0],
+            // Right normals
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            // Left normals
+            [-1.0, 0.0, 0.0],
+            [-1.0, 0.0, 0.0],
+            [-1.0, 0.0, 0.0],
+            [-1.0, 0.0, 0.0],
+            // Front normals
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0],
+            // Back normals
+            [0.0, 0.0, -1.0],
+            [0.0, 0.0, -1.0],
+            [0.0, 0.0, -1.0],
+            [0.0, 0.0, -1.0],
+        ],
+    );
+
+    cube_mesh.set_indices(Some(Indices::U32(vec![
+        0, 1, 2, 2, 3, 0, // Top triangles
+        4, 7, 6, 6, 5, 4, // Bottom triangles
+        8, 9, 10, 10, 11, 8, // Right triangles
+        12, 13, 14, 14, 15, 12, // Left triangles
+        16, 17, 18, 18, 19, 16, // Front triangles
+        20, 21, 22, 22, 23, 20, // Back triangles
+    ])));
+
+    cube_mesh
+}
