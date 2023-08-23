@@ -42,7 +42,7 @@ pub fn setup(
 
     commands.spawn(PbrBundle {
         mesh: meshes.add(generate_cube_mesh(Vec3::new(3.0, 3.0, 3.0))),
-        material: materials.add(Color::RED.into()),
+        material: materials.add(Color::PURPLE.into()),
         transform: Transform::from_xyz(0.0, 5.0, 0.0),
         ..default()
     });
